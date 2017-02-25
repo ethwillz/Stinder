@@ -10,16 +10,26 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Iterator;
 
 public class MainScreen extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +40,35 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback {
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        Button changeClass = (Button) findViewById(R.id.changeClass);
-        changeClass.setOnClickListener(new View.OnClickListener() {
+        //Initializes the database
+        mDatabase = new FirebaseDatabase().getInstance().getReference();
+
+        findViewById(R.id.changeClass).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Add user, class, lat, and long to database
 
+                //Gets all users in database studying same class and plots on map
+                mDatabase.child("onlineUsers").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        EditText subject = (EditText) findViewById(R.id.subject);
+                        Iterable<DataSnapshot> usernames = dataSnapshot.getChildren();
+                        Iterator<DataSnapshot> user = usernames.iterator();
+
+                        while(user.hasNext()){
+                            if(user.next().child("class").getValue().toString().equals(subject.getText().toString())){
+                                //Plot users lat and lng on map
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(Double.parseDouble(user.next().child("lat").getValue().toString()), Double.parseDouble(user.next().child("lng").getValue().toString())))
+                                        .title(user.next().getKey()));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
             }
         });
     }

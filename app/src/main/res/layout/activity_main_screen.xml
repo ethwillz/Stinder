@@ -9,6 +9,7 @@
         android:orientation="horizontal"
         xmlns:android="http://schemas.android.com/apk/res/android">
         <EditText
+            android:id="@+id/subject"
             android:layout_height="wrap_content"
             android:layout_width="300dp"
             android:backgroundTint="@color/colorPrimary"
