@@ -34,6 +34,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     private DatabaseReference mDatabase;
     double lat, lng;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

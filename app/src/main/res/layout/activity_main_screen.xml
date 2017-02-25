@@ -18,6 +18,7 @@
             android:gravity="bottom"
             android:inputType="text"
             android:hint="class, all lowercase i.e. 'com s 327'"/>
+
         <Button
             android:layout_height="50dp"
             android:layout_width="50dp"
