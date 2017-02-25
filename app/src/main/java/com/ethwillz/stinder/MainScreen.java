@@ -3,25 +3,23 @@ package com.ethwillz.stinder;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.ShapeDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MotionEventCompat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +36,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +48,8 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
     double lat, lng;
     LinearLayout mainLayout;
     FirebaseUser user;
-    PopupWindow userInformation;
+    BottomSheetBehavior mBottomSheetBehavior;
+    Marker curMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +60,23 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheet));
+        mBottomSheetBehavior.setState(mBottomSheetBehavior.STATE_HIDDEN);
+        mBottomSheetBehavior.from(findViewById(R.id.bottomSheet)).setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        curMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                // no op
+            }
+        });
 
         //Initializes the database
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -84,13 +101,9 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
                         //Uncomment out user.getUid() when authentication set up
                         mDatabase.child("onlineUsers").child("testUid"/*user.getUid()*/).setValue(userLocation);
 
-                        Iterable<DataSnapshot> users = dataSnapshot.getChildren();
-                        Iterator<DataSnapshot> uids = users.iterator();
-
                         //Runs while there are more users in table
-                        while(uids.hasNext()) {
-                            DataSnapshot entry = uids.next();
-                            double nextLat = Double.parseDouble(entry.child("lat").getValue().toString());
+                        for(DataSnapshot entry: dataSnapshot.getChildren()) {
+                              double nextLat = Double.parseDouble(entry.child("lat").getValue().toString());
                             double nextLng = Double.parseDouble(entry.child("lng").getValue().toString());
 
                             //Checks if pin is not current user's and pin is within a certain distance of user
@@ -101,7 +114,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
                                         //Plot users lat and lng on map
                                         mMap.addMarker(new MarkerOptions()
                                                 .position(new LatLng(nextLat, nextLng))
-                                                .title(entry.child("username").getValue().toString())
+                                                .title(entry.getKey())
                                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
                                     }
                                 }
@@ -147,42 +160,28 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
 
     @Override
     public boolean onMarkerClick(final Marker marker){
+        curMarker = marker;
         //Sets icon to blue
         marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
+        mDatabase.child("users").child(marker.getTitle()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                TextView name = (TextView) findViewById(R.id.userInfoName);
+                name.setText(dataSnapshot.child("name").getValue().toString());
+                TextView username = (TextView) findViewById(R.id.userInfoUsername);
+                username.setText(dataSnapshot.child("username").getValue().toString());
+                TextView major = (TextView) findViewById(R.id.userInfoMajor);
+                major.setText(dataSnapshot.child("major").getValue().toString());
+            }
 
-        //Creates popup window and populates user info for it
-        final View userInfo = getLayoutInflater().inflate(R.layout.user_info_layout, null, false);
-        userInformation = new PopupWindow(userInfo, 1000, 500, true);
-        userInformation.showAtLocation(mainLayout, Gravity.BOTTOM, 10, 10);
-        userInformation.setOutsideTouchable(true);
-        userInformation.setTouchable(true);
-        userInformation.setFocusable(true);
-        //userInformation.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-        //userInformation.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
-        userInformation.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        //If user clicks outside of popup window it is dismissed
-        userInformation.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
-            public void onDismiss() {
-                // some action ....
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
-        userInformation.setTouchInterceptor(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-                if (motionEvent.getAction() == MotionEvent.ACTION_OUTSIDE) {
-                    userInformation.dismiss();
-                    return true;
-                }
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    userInformation.dismiss();
-                    return true;
-                }
-                return false;
-            }
-        });
+
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
         return true;
     }

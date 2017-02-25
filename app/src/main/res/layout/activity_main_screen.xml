@@ -1,40 +1,110 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#ffffff">
+    android:fitsSystemWindows="true">
 
     <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:orientation="horizontal"
-        xmlns:android="http://schemas.android.com/apk/res/android">
-        <EditText
-            android:id="@+id/subject"
-            android:layout_height="wrap_content"
-            android:layout_width="300dp"
-            android:backgroundTint="@color/colorPrimary"
-            android:foregroundTint="#ffffff"
-            android:layout_gravity="center_horizontal"
-            android:gravity="bottom"
-            android:inputType="text"
-            android:hint="class, all lowercase i.e. 'com s 327'"/>
-        <Button
-            android:layout_height="50dp"
-            android:layout_width="50dp"
-            android:id="@+id/changeClass">
-
-        </Button>
-    </LinearLayout>
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.ethwillz.stinder.MainScreen" >
+        android:orientation="vertical"
+        android:background="#ffffff">
 
-    </fragment>
-</LinearLayout>
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+            <EditText
+                android:id="@+id/subject"
+                android:layout_height="wrap_content"
+                android:layout_width="300dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:foregroundTint="#ffffff"
+                android:layout_gravity="center_horizontal"
+                android:gravity="bottom"
+                android:inputType="text"
+                android:hint="class,  i.e. com s 327"/>
+            <Button
+                android:layout_height="50dp"
+                android:layout_width="50dp"
+                android:id="@+id/changeClass">
+
+            </Button>
+        </LinearLayout>
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.ethwillz.stinder.MainScreen" >
+
+        </fragment>
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:behavior_hideable="true"
+        android:id="@+id/bottomSheet"
+        android:background="#ffffff">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp">
+
+            <TextView
+                android:id="@+id/userInfoName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20dp"
+                android:text="test name"/>
+
+            <TextView
+                android:id="@+id/userInfoUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20dp"
+                android:text="test username"/>
+
+            <TextView
+                android:id="@+id/userInfoMajor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="20dp"
+                android:text="test major"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Chat"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--
+            User picture
+            !-->
+
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>
