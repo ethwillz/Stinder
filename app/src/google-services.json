@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "717236120005",
+    "firebase_url": "https://solar-maker-159804.firebaseio.com",
+    "project_id": "solar-maker-159804",
+    "storage_bucket": "solar-maker-159804.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717236120005:android:e911292d39d07497",
+        "android_client_info": {
+          "package_name": "com.ethwillz.stinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "717236120005-q8stuvl625o3ua0qp8mk0f9phhuhs27u.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "717236120005-0u84pagnfp885p7q7jb767jsmqib6rgu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ethwillz.stinder",
+            "certificate_hash": "538b2cd3a21588051897ce17e9187a17df83572c"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtXciL0JqOtBsShP0rqD8MuIJSqnRrR48"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "717236120005-q8stuvl625o3ua0qp8mk0f9phhuhs27u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
