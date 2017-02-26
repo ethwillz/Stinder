@@ -34,10 +34,10 @@ public class LoginScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_screen);
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            Intent i = new Intent(this, MainScreen.class);
-            startActivity(i);
-        }
+//        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+//            Intent i = new Intent(this, MainScreen.class);
+//            startActivity(i);
+//        }
 
         authent = FirebaseAuth.getInstance();
         signIn = (Button) findViewById(R.id.sign_in_button);
