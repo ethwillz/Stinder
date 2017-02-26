@@ -102,7 +102,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
                         userLocation.put("lat", lat + "");
                         userLocation.put("lng", lng + "");
                         //Uncomment out user.getUid() when authentication set up
-                        mDatabase.child("onlineUsers").child("testUid"/*user.getUid()*/).setValue(userLocation);
+                        mDatabase.child("onlineUsers").child(user.getUid()).setValue(userLocation);
 
                         //Runs while there are more users in table
                         for(DataSnapshot entry: dataSnapshot.getChildren()) {
@@ -110,7 +110,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
                             double nextLng = Double.parseDouble(entry.child("lng").getValue().toString());
 
                             //Checks if pin is not current user's and pin is within a certain distance of user
-                            if (!entry.getKey().equals("testUid"/*user.getUid()*/) //TODO add real uid and distance
+                            if (!entry.getKey().equals(user.getUid()) //TODO add real uid and distance
                                     /*&& nextLat <= lat + .01 && nextLat >= lat - .01
                                     && nextLng <= lng + .01 && nextLng >= lat - .01*/){
                                     if (entry.child("class").getValue().toString().equals(subject.getText().toString())) {
@@ -146,8 +146,8 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
             Criteria criteria = new Criteria();
             String provider = locationManager.getBestProvider(criteria,true);
             Location loc = locationManager.getLastKnownLocation(provider);
-            double lat = loc.getLatitude();
-            double lng = loc.getLongitude();
+            lat = loc.getLatitude();
+            lng = loc.getLongitude();
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 15f));
         } else {
             // Show rationale and request permission.

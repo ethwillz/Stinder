@@ -127,7 +127,7 @@ public class LoginScreen extends AppCompatActivity {
                                     mDatabase.child("users").child(user.getUid()).child("username").setValue(inputUsername);
                                     mDatabase.child("users").child(user.getUid()).child("name").setValue(inputName);
                                     mDatabase.child("users").child(user.getUid()).child("email").setValue(inputEmail);
-                                    mDatabase.child("users").child("uid").child("major").setValue(inputMajor);
+                                    mDatabase.child("users").child(user.getUid()).child("major").setValue(inputMajor);
                                     startActivity(new Intent(LoginScreen.this, MainScreen.class));
                                     finish();
                                 }
