@@ -1,4 +1,6 @@
-package com.ethwillz.stinder; /**
+package com.ethwillz.stinder;
+
+/**
  * Created by maxtalley on 2/25/17.
  */
 
@@ -22,37 +24,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginScreen extends AppCompatActivity {
-    private EditText email, password, major, name, username;
+    private EditText email, password;
     private Button signIn, signUp, resetPass;
     private FirebaseAuth authent;
-    private DatabaseReference mDatabase;
-    private FirebaseUser user;
-    String inputEmail, inputPass, inputMajor, inputName, inputUsername;
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    String inputEmail, inputPass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.registration_screen_layout);
+        setContentView(R.layout.login_screen);
 
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(R.string.default_web_client_id))
-//                .requestEmail()
-//                .build();
-//
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .enableAutoManage(this, this)
-
-        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             Intent i = new Intent(this, MainScreen.class);
             startActivity(i);
         }
-
 
         authent = FirebaseAuth.getInstance();
         signIn = (Button) findViewById(R.id.sign_in_button);
@@ -60,73 +45,36 @@ public class LoginScreen extends AppCompatActivity {
         resetPass = (Button) findViewById(R.id.btn_reset_pass);
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
-        username = (EditText) findViewById(R.id.username);
-        major = (EditText) findViewById(R.id.major);
-        name = (EditText) findViewById(R.id.name);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-
-//        resetPass.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(com.ethwillz.stinder.LoginScreen.this, ResetPasswordActivity.class));
-//            }
-//        });
 
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                startActivity(new Intent(LoginScreen.this, RegistrationScreen.class));
+            }
+        });
+
+        resetPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginScreen.this, ResetPassword.class));
+            }
+        });
+
+        signIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 inputEmail = email.getText().toString().trim();
                 inputPass = password.getText().toString().trim();
-                inputMajor = major.getText().toString().trim();
-                inputName = name.getText().toString().trim();
-                inputUsername = username.getText().toString().trim();
 
-                if (TextUtils.isEmpty(inputEmail)) {
-                    Toast.makeText(getApplicationContext(), "Please enter your email", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (TextUtils.isEmpty(inputPass)) {
-                    Toast.makeText(getApplicationContext(), "Please enter a password", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (TextUtils.isEmpty(inputUsername)) {
-                    Toast.makeText(getApplicationContext(), "Please enter a username", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (TextUtils.isEmpty(inputMajor)) {
-                    Toast.makeText(getApplicationContext(), "Please enter your major", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (TextUtils.isEmpty(inputName)) {
-                    Toast.makeText(getApplicationContext(), "Please enter your name", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (password.length() < 6) {
-                    Toast.makeText(getApplicationContext(), "Password must be more than 6 characters", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-
-                authent.createUserWithEmailAndPassword(inputEmail, inputPass)
+                authent.signInWithEmailAndPassword(inputEmail, inputPass)
                         .addOnCompleteListener(LoginScreen.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                Toast.makeText(LoginScreen.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginScreen.this, "" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
 
                                 if (!task.isSuccessful()) {
-                                    Toast.makeText(LoginScreen.this, "Authentication Failed" + task.getException(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(LoginScreen.this, "Authentication Failed" /*+ task.getException()*/, Toast.LENGTH_LONG).show();
                                 } else {
-                                    user = FirebaseAuth.getInstance().getCurrentUser();
-                                    mDatabase.child("users").child(user.getUid()).child("username").setValue(inputUsername);
-                                    mDatabase.child("users").child(user.getUid()).child("name").setValue(inputName);
-                                    mDatabase.child("users").child(user.getUid()).child("email").setValue(inputEmail);
-                                    mDatabase.child("users").child(user.getUid()).child("major").setValue(inputMajor);
                                     startActivity(new Intent(LoginScreen.this, MainScreen.class));
                                     finish();
                                 }
@@ -134,11 +82,5 @@ public class LoginScreen extends AppCompatActivity {
                         });
             }
         });
-
-
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 }
