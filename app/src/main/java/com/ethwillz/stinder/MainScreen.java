@@ -53,6 +53,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
     FirebaseUser user;
     BottomSheetBehavior mBottomSheetBehavior;
     Marker curMarker;
+    String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +90,17 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
             @Override
             public void onClick(View view) {
 
+                mDatabase.child("users").child(user.getUid()).child("username").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        username = dataSnapshot.getValue().toString();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+
                 //Gets all users in database studying same class and plots on map
                 mDatabase.child("onlineUsers").addValueEventListener(new ValueEventListener() {
                     @Override
@@ -97,7 +109,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
 
                         //Adds user to list of online students looking for partners
                         HashMap<String, String> userLocation = new HashMap<>();
-                        userLocation.put("username", "random username"); //TODO get actual username
+                        userLocation.put("username", username);
                         userLocation.put("class", subject.getText().toString());
                         userLocation.put("lat", lat + "");
                         userLocation.put("lng", lng + "");
