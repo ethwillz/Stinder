@@ -167,7 +167,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
     @Override
     public boolean onMarkerClick(final Marker marker){
         curMarker = marker;
-        //Sets icon to blue
+        //Sets icon to red
         marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
         mDatabase.child("users").child(marker.getTitle()).addValueEventListener(new ValueEventListener() {
