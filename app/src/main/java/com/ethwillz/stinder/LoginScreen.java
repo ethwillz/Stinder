@@ -4,9 +4,15 @@ package com.ethwillz.stinder;
  * Created by maxtalley on 2/25/17.
  */
 
+import android.*;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -14,6 +20,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -22,6 +30,20 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import static com.google.firebase.crash.FirebaseCrash.log;
 
 public class LoginScreen extends AppCompatActivity {
     private EditText email, password;
@@ -34,6 +56,18 @@ public class LoginScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_screen);
 
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(getString(R.string.default_web_client_id))
+//                .requestEmail()
+//                .build();
+//
+//        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .enableAutoManage(this, this)
+
+//        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+//            Intent i = new Intent(this, MainScreen.class);
+//            startActivity(i);
+//        }
 //        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
 //            Intent i = new Intent(this, MainScreen.class);
 //            startActivity(i);
@@ -65,6 +99,18 @@ public class LoginScreen extends AppCompatActivity {
             public void onClick(View v) {
                 inputEmail = email.getText().toString().trim();
                 inputPass = password.getText().toString().trim();
+
+                if (TextUtils.isEmpty(inputEmail)) {
+                    Toast.makeText(getApplicationContext(), "Please enter your email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (TextUtils.isEmpty(inputPass)) {
+                    Toast.makeText(getApplicationContext(), "Please enter a password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
 
                 authent.signInWithEmailAndPassword(inputEmail, inputPass)
                         .addOnCompleteListener(LoginScreen.this, new OnCompleteListener<AuthResult>() {
