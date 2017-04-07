@@ -66,6 +66,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        //mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheet));
         mBottomSheetBehavior.setState(mBottomSheetBehavior.STATE_HIDDEN);
@@ -209,6 +210,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
         return true;
     }
 
+    //TODO Add option to remove yourself from online users so the app doesn't have to be destoryed and you can be messaged more efefctively
     @Override
     public void onDestroy(){
         //Removes user from online users section of database upon exiting application
@@ -217,7 +219,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
         mDatabase.child("onlineUsers").child(user.getUid()).removeValue();
         super.onDestroy();
     }
-
+/*
     @Override
     public void onPause(){
         //Removes user from online users section of database upon exiting application
@@ -225,5 +227,5 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
         System.out.println("Exit method running");
         mDatabase.child("onlineUsers").child(user.getUid()).removeValue();
         super.onPause();
-    }
+    }*/
 }

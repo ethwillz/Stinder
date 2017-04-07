@@ -6,35 +6,13 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
         android:background="#ffffff">
-
-        <LinearLayout
-            android:layout_height="wrap_content"
-
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            xmlns:android="http://schemas.android.com/apk/res/android">
-            <EditText
-                android:id="@+id/subject"
-                android:layout_height="wrap_content"
-                android:layout_width="300dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:foregroundTint="#ffffff"
-                android:layout_gravity="center_horizontal"
-                android:gravity="bottom"
-                android:inputType="text"
-                android:hint="class,  i.e. com s 327"/>
-            <Button
-                android:layout_height="50dp"
-                android:layout_width="50dp"
-                android:id="@+id/changeClass">
-
-            </Button>
-        </LinearLayout>
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
@@ -43,9 +21,35 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context="com.ethwillz.stinder.MainScreen" >
-
         </fragment>
-    </LinearLayout>
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <EditText
+                android:id="@+id/subject"
+                android:layout_height="44dp"
+                android:layout_width="300dp"
+                android:background="@drawable/main_search_field"
+                android:layout_gravity="center_horizontal"
+                android:inputType="text"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:hint="Class department and code"/>
+            <!--^^^^^^^^^^^^^Make this into a floating label instead of a hint-->
+
+            <Button
+                android:layout_height="50dp"
+                android:layout_width="50dp"
+                android:id="@+id/changeClass">
+            </Button>
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal" android:layout_width="match_parent"
