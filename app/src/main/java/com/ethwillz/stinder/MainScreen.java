@@ -40,6 +40,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -53,7 +54,8 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
     FirebaseUser user;
     BottomSheetBehavior mBottomSheetBehavior;
     Marker curMarker;
-    String username;
+    String username, provider;
+    LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
             @Override
             public void onClick(View view) {
 
+
                 mDatabase.child("users").child(user.getUid()).child("username").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -105,6 +108,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
                 mDatabase.child("onlineUsers").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        mMap.clear(); //Clears all pins from old class
                         EditText subject = (EditText) findViewById(R.id.subject);
 
                         //Adds user to list of online students looking for partners
@@ -122,7 +126,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
                             double nextLng = Double.parseDouble(entry.child("lng").getValue().toString());
 
                             //Checks if pin is not current user's and pin is within a certain distance of user
-                            if (!entry.getKey().equals(user.getUid()) //TODO add real uid and distance
+                            if (!entry.getKey().equals(user.getUid())
                                     /*&& nextLat <= lat + .01 && nextLat >= lat - .01
                                     && nextLng <= lng + .01 && nextLng >= lat - .01*/){
                                     if (entry.child("class").getValue().toString().equals(subject.getText().toString())) {
@@ -154,9 +158,9 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
                 == PackageManager.PERMISSION_GRANTED) {
             //Gets current location and sets camera to center and zoom on that location
             mMap.setMyLocationEnabled(true);
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
-            String provider = locationManager.getBestProvider(criteria,true);
+            provider = locationManager.getBestProvider(criteria,true);
             Location loc = locationManager.getLastKnownLocation(provider);
             lat = loc.getLatitude();
             lng = loc.getLongitude();
@@ -178,9 +182,6 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
 
     @Override
     public boolean onMarkerClick(final Marker marker){
-        curMarker = marker;
-        //Sets icon to red
-        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
         mDatabase.child("users").child(marker.getTitle()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -201,6 +202,28 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
 
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
+        curMarker = marker;
+        //Sets icon to red
+        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
         return true;
+    }
+
+    @Override
+    public void onDestroy(){
+        //Removes user from online users section of database upon exiting application
+        //TODO Move this to a static method in seperate class & reference in every activity
+        System.out.println("Exit method running");
+        mDatabase.child("onlineUsers").child(user.getUid()).removeValue();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onPause(){
+        //Removes user from online users section of database upon exiting application
+        //TODO Move this to a static method in seperate class & reference in every activity
+        System.out.println("Exit method running");
+        mDatabase.child("onlineUsers").child(user.getUid()).removeValue();
+        super.onPause();
     }
 }

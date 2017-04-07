@@ -100,27 +100,28 @@ public class LoginScreen extends AppCompatActivity {
                 inputEmail = email.getText().toString().trim();
                 inputPass = password.getText().toString().trim();
 
+                //Checks if email field is empty, prompts user to enter if empty
                 if (TextUtils.isEmpty(inputEmail)) {
                     Toast.makeText(getApplicationContext(), "Please enter your email", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                //Checks if password field is empty, prompts user to enter if empty
                 if (TextUtils.isEmpty(inputPass)) {
                     Toast.makeText(getApplicationContext(), "Please enter a password", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-
-
+                //Checks with Firebase authentication handler if credentials are invalid, shows authentication failed if unsuccessful
                 authent.signInWithEmailAndPassword(inputEmail, inputPass)
                         .addOnCompleteListener(LoginScreen.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                Toast.makeText(LoginScreen.this, "" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
 
                                 if (!task.isSuccessful()) {
                                     Toast.makeText(LoginScreen.this, "Authentication Failed" /*+ task.getException()*/, Toast.LENGTH_LONG).show();
-                                } else {
+                                }
+                                else {
                                     startActivity(new Intent(LoginScreen.this, MainScreen.class));
                                     finish();
                                 }
