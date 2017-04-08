@@ -32,20 +32,16 @@
             <EditText
                 android:id="@+id/subject"
                 android:layout_height="44dp"
-                android:layout_width="300dp"
+                android:layout_width="match_parent"
+                android:layout_marginRight="8dp"
                 android:background="@drawable/main_search_field"
                 android:layout_gravity="center_horizontal"
                 android:inputType="text"
                 android:textSize="20sp"
                 android:textColor="#000000"
-                android:hint="Class department and code"/>
-            <!--^^^^^^^^^^^^^Make this into a floating label instead of a hint-->
-
-            <Button
-                android:layout_height="50dp"
-                android:layout_width="50dp"
-                android:id="@+id/changeClass">
-            </Button>
+                android:hint="Class department and code"
+                android:imeOptions="actionSearch" />
+            <!--^^^^^^^^^^^^^Make hint into a floating label instead of a hint-->
 
         </LinearLayout>
 
@@ -99,6 +95,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:id="@+id/chat"
                 android:text="Chat"/>
 
         </LinearLayout>

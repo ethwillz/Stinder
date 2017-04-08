@@ -74,6 +74,10 @@ public class LoginScreen extends AppCompatActivity {
 //        }
 
         authent = FirebaseAuth.getInstance();
+        if(authent.getCurrentUser().getUid() != null){
+            Intent i = new Intent(this, MainScreen.class);
+            startActivity(i);
+        }
         signIn = (Button) findViewById(R.id.sign_in_button);
         signUp = (Button) findViewById(R.id.sign_up_button);
         resetPass = (Button) findViewById(R.id.btn_reset_pass);

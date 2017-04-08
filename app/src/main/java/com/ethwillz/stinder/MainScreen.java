@@ -16,8 +16,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -56,6 +59,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
     Marker curMarker;
     String username, provider;
     LocationManager locationManager;
+    EditText subject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +70,6 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        //mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheet));
         mBottomSheetBehavior.setState(mBottomSheetBehavior.STATE_HIDDEN);
@@ -89,48 +92,52 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-        findViewById(R.id.changeClass).setOnClickListener(new View.OnClickListener() {
+        subject = (EditText) findViewById(R.id.subject);
+        subject.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mgr.hideSoftInputFromWindow(subject.getWindowToken(), 0);
 
+                    mDatabase.child("users").child(user.getUid()).child("username").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            username = dataSnapshot.getValue().toString();
+                        }
 
-                mDatabase.child("users").child(user.getUid()).child("username").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        username = dataSnapshot.getValue().toString();
-                    }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+                    //Gets all users in database studying same class and plots on map
+                    mDatabase.child("onlineUsers").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            mMap.clear(); //Clears all pins from old class
+                            EditText subject = (EditText) findViewById(R.id.subject);
 
-                //Gets all users in database studying same class and plots on map
-                mDatabase.child("onlineUsers").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        mMap.clear(); //Clears all pins from old class
-                        EditText subject = (EditText) findViewById(R.id.subject);
+                            //Adds user to list of online students looking for partners
+                            HashMap<String, String> userLocation = new HashMap<>();
+                            userLocation.put("username", username);
+                            userLocation.put("class", subject.getText().toString());
+                            userLocation.put("lat", lat + "");
+                            userLocation.put("lng", lng + "");
+                            //Uncomment out user.getUid() when authentication set up
+                            mDatabase.child("onlineUsers").child(user.getUid()).setValue(userLocation);
 
-                        //Adds user to list of online students looking for partners
-                        HashMap<String, String> userLocation = new HashMap<>();
-                        userLocation.put("username", username);
-                        userLocation.put("class", subject.getText().toString());
-                        userLocation.put("lat", lat + "");
-                        userLocation.put("lng", lng + "");
-                        //Uncomment out user.getUid() when authentication set up
-                        mDatabase.child("onlineUsers").child(user.getUid()).setValue(userLocation);
+                            //Runs while there are more users in table
+                            for (DataSnapshot entry : dataSnapshot.getChildren()) {
+                                double nextLat = Double.parseDouble(entry.child("lat").getValue().toString());
+                                double nextLng = Double.parseDouble(entry.child("lng").getValue().toString());
 
-                        //Runs while there are more users in table
-                        for(DataSnapshot entry: dataSnapshot.getChildren()) {
-                              double nextLat = Double.parseDouble(entry.child("lat").getValue().toString());
-                            double nextLng = Double.parseDouble(entry.child("lng").getValue().toString());
-
-                            //Checks if pin is not current user's and pin is within a certain distance of user
-                            if (!entry.getKey().equals(user.getUid())
+                                //Checks if pin is not current user's and pin is within a certain distance of user
+                                if (!entry.getKey().equals(user.getUid())
                                     /*&& nextLat <= lat + .01 && nextLat >= lat - .01
-                                    && nextLng <= lng + .01 && nextLng >= lat - .01*/){
-                                    if (entry.child("class").getValue().toString().equals(subject.getText().toString())) {
+                                    && nextLng <= lng + .01 && nextLng >= lat - .01*/) {
+                                    if (entry.child("class").getValue().toString().equals(subject.getText().toString())
+                                            && nextLat < lat + .1 && nextLat > lat - .1 && nextLng < lng + .1 && nextLng > lng - .1) {
                                         //Plot users lat and lng on map
                                         mMap.addMarker(new MarkerOptions()
                                                 .position(new LatLng(nextLat, nextLng))
@@ -141,10 +148,23 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
                             }
                         }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        //Handles opening new chat with another user
+        findViewById(R.id.chat).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //String uid1 = user.getUid();
+                //String uid2 =
             }
         });
     }
@@ -153,6 +173,7 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -218,6 +239,12 @@ public class MainScreen extends FragmentActivity implements OnMapReadyCallback, 
         System.out.println("Exit method running");
         mDatabase.child("onlineUsers").child(user.getUid()).removeValue();
         super.onDestroy();
+    }
+
+    //Doesn't do anything when back button pressed
+    @Override
+    public void onBackPressed(){
+
     }
 /*
     @Override
